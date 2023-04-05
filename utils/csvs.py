@@ -60,6 +60,10 @@ class MetadataParser:
         value = float("{0:.2f}".format(df_size))
         _dict["df_size_in_mb"] = value
 
+    @staticmethod
+    def set_name(_dict, filename) -> None:
+        _dict["name"] = filename.replace(".csv", "_csv")
+
     def list_csvs(self) -> list[dict]:
         """This method read csv files and write details into the list
 
@@ -78,6 +82,7 @@ class MetadataParser:
 
             item_dict: dict = {}
 
+            self.set_name(item_dict, filename)
             self.csv_file_size(item, item_dict)
             self.df_of_csv_rows_n(item_dict, df)
             self.df_of_csv_columns_n(item_dict, df)
@@ -85,8 +90,7 @@ class MetadataParser:
             self.df_size_in_mb(item_dict, df_size)
             item_dict["created"] = datetime.now().isoformat("T", "seconds")
             item_dict["updated"] = datetime.now().isoformat("T", "seconds")
-            # TODO: i need to change this line bellow, and add already created dict
-            dict_list.append({filename.replace(".csv", "_csv"): item_dict})
+            dict_list.append(item_dict)
 
         return dict_list
 
@@ -95,7 +99,7 @@ class MetadataParser:
         # write data to json file with timestamp
         date = datetime.now().isoformat("T", "seconds")
         # with open(f"./summary_{date}.json", "w", encoding="utf-8") as f:
-        #     json.dump(_list, f, ensure_ascii=False)
+            # json.dump(_list, f, ensure_ascii=False, indent=4)
         df = pd.DataFrame(_list)
         df.to_json(
             f"./summary_{date}.json",
