@@ -6,47 +6,41 @@ import os
 
 
 class WriteDb:
-    def __init__(self,
-                 db_name,
-                 db_user,
-                 db_pass,
-                 db_host,
-                 db_port,
-                 gcloud_key
-                 ):
-        print("Starting connection...")
-        # TODO: i should remove this conn object
-        self.conn = psycopg2.connect(
-            database=db_name,
-            user=db_user,
-            password=db_pass,
-            host=db_host,
-            port=db_port,
+    def __init__(self, gcloud_key):
+        self.gcloud_key = gcloud_key
+
+        assert os.path.isfile(self.gcloud_key), f"file '{self.gcloud_key}' does not exists"
+
+    def get_client(self) -> bigquery.Client:
+        credentials = service_account.Credentials.from_service_account_file(self.gcloud_key)
+
+        client = bigquery.Client(
+            credentials=credentials,
+            project=credentials.project_id
+            )
+        return client
+
+    def create_table(self, table_id: str, client: bigquery.Client) -> None:
+        # calling the function "project.dataset.table_id"
+        schema = [
+            bigquery.SchemaField("name", "STRING", mode="REQUIRED"),
+            bigquery.SchemaField("csv_file_size_in_mb", "FLOAT", mode="REQUIRED"),
+            bigquery.SchemaField("df_of_csv_rows_n", "INTEGER", mode="REQUIRED"),
+            bigquery.SchemaField("df_of_csv_columns_n", "INTEGER", mode="REQUIRED"),
+            bigquery.SchemaField("df_one_column_size_in_mb", "FLOAT", mode="REQUIRED"),
+            bigquery.SchemaField("df_size_in_mb", "FLOAT", mode="REQUIRED"),
+            bigquery.SchemaField("created", "TIMESTAMP", mode="REQUIRED"),
+            bigquery.SchemaField("updated", "TIMESTAMP", mode="REQUIRED"),
+
+        ]
+
+        table = bigquery.Table(table_id, schema=schema)
+        table = client.create_table(table)
+        print(
+            "Created table {}.{}.{}".format(
+                table.project, table.dataset_id, table.table_id)
         )
-        print("Connection has started!")
-        self.cursor = self.conn.cursor()
 
-        assert os.path.isfile(gcloud_key), f"file '{gcloud_key}' does not exists"
-
-    # TODO: i need to change this to create bigquery table instead postgresl
-    def create_table(self):
-        create_query = """
-        CREATE TABLE IF NOT EXISTS csv_data (
-            id BIGSERIAL PRIMARY KEY,
-            name TEXT UNIQUE,
-            csv_file_size_in_mb FLOAT,
-            df_of_csv_rows_n INTEGER,
-            df_of_csv_columns_n INTEGER,
-            df_one_column_size_in_mb FLOAT,
-            df_size_in_mb FLOAT,
-            created TIMESTAMP,
-            updated TIMESTAMP
-        );
-        """
-        print("Creating table...")
-        self.cursor.execute(create_query)
-        self.conn.commit()
-        print("Table has created!")
 
     # TODO: i need to change this to check filename into bigquery
     def check_filename(self, name: str) -> bool:
