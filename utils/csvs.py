@@ -1,5 +1,4 @@
 import glob
-import json
 import os
 from datetime import datetime
 
@@ -98,8 +97,7 @@ class MetadataParser:
     def write_to_json(_list: list[dict]) -> None:
         # write data to json file with timestamp
         date = datetime.now().isoformat("T", "seconds")
-        # with open(f"./summary_{date}.json", "w", encoding="utf-8") as f:
-            # json.dump(_list, f, ensure_ascii=False, indent=4)
+
         df = pd.DataFrame(_list)
         df.to_json(
             f"./summary_{date}.json",

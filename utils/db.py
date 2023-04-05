@@ -15,6 +15,7 @@ class WriteDb:
                  gcloud_key
                  ):
         print("Starting connection...")
+        # TODO: i should remove this conn object
         self.conn = psycopg2.connect(
             database=db_name,
             user=db_user,
@@ -27,6 +28,7 @@ class WriteDb:
 
         assert os.path.isfile(gcloud_key), f"file '{gcloud_key}' does not exists"
 
+    # TODO: i need to change this to create bigquery table instead postgresl
     def create_table(self):
         create_query = """
         CREATE TABLE IF NOT EXISTS csv_data (
@@ -46,6 +48,7 @@ class WriteDb:
         self.conn.commit()
         print("Table has created!")
 
+    # TODO: i need to change this to check filename into bigquery
     def check_filename(self, name: str) -> bool:
         name = name.replace(".csv", "_csv")
         search_query = f"""
@@ -58,6 +61,7 @@ class WriteDb:
             return True
         return False
 
+    # TODO: change to write data into bigquery
     def write_to_db(self, _dict: dict[str, dict]) -> None:
         insert_query = """
             INSERT INTO csv_data (
@@ -95,6 +99,7 @@ class WriteDb:
         ))
         self.conn.commit()
 
+    # TODO: update data into bigquery
     def update(self, _dict: dict[str, dict]):
         name = list(_dict)[0]
         inner_dict: dict[str, str] = _dict.get(name)
