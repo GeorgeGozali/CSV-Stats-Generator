@@ -20,8 +20,13 @@ class WriteDb:
             )
         return client
 
-    def create_table(self, table_id: str, client: bigquery.Client) -> None:
-        # calling the function "project.dataset.table_id"
+    def create_table(
+            self,
+            project_id: str,
+            dataset: str,
+            table_id: str,
+            client: bigquery.Client
+            ) -> None:
         schema = [
             bigquery.SchemaField("name", "STRING", mode="REQUIRED"),
             bigquery.SchemaField("csv_file_size_in_mb", "FLOAT", mode="REQUIRED"),
@@ -33,6 +38,7 @@ class WriteDb:
             bigquery.SchemaField("updated", "TIMESTAMP", mode="REQUIRED"),
 
         ]
+        table_id = f"{project_id}.{dataset}.{table_id}"
 
         table = bigquery.Table(table_id, schema=schema)
         table = client.create_table(table)
