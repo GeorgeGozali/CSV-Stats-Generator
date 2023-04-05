@@ -77,6 +77,7 @@ class MetadataParser:
             df_size = df.memory_usage(deep=True).values.sum() / (1024 * 1024)
 
             item_dict: dict = {}
+
             self.csv_file_size(item, item_dict)
             self.df_of_csv_rows_n(item_dict, df)
             self.df_of_csv_columns_n(item_dict, df)
@@ -84,7 +85,8 @@ class MetadataParser:
             self.df_size_in_mb(item_dict, df_size)
             item_dict["created"] = datetime.now().isoformat("T", "seconds")
             item_dict["updated"] = datetime.now().isoformat("T", "seconds")
-            dict_list.append({filename: item_dict})
+            # TODO: i need to change this line bellow, and add already created dict
+            dict_list.append({filename.replace(".csv", "_csv"): item_dict})
 
         return dict_list
 
@@ -93,9 +95,10 @@ class MetadataParser:
         # write data to json file with timestamp
         date = datetime.now().isoformat("T", "seconds")
         # with open(f"./summary_{date}.json", "w", encoding="utf-8") as f:
-        #     json.dump(_list, f, ensure_ascii=False, indent=4)
+        #     json.dump(_list, f, ensure_ascii=False)
         df = pd.DataFrame(_list)
         df.to_json(
             f"./summary_{date}.json",
-            orient='records'
+            orient='records',
+            lines=True
             )

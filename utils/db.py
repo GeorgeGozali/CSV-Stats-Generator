@@ -47,6 +47,7 @@ class WriteDb:
         print("Table has created!")
 
     def check_filename(self, name: str) -> bool:
+        name = name.replace(".csv", "_csv")
         search_query = f"""
             SELECT name FROM csv_data
             WHERE name='{name}';
