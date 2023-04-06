@@ -2,6 +2,7 @@ import psycopg2
 from datetime import datetime
 from google.cloud import bigquery
 from google.oauth2 import service_account
+from google.cloud.exceptions import NotFound
 import os
 
 
@@ -26,15 +27,11 @@ class WriteDb:
             client: bigquery.Client
     ) -> bool:
 
-        QUERY = (
-            f"SELECT size_bytes FROM {table_id}.__TABLES__"
-            "WHERE table_id='mytablename'"
-        )
-
-        job = client.query(QUERY)
-        rows = job.result()
-        print(rows)
-
+        try:
+            client.get_table(table_id)  # Make an API request.
+            return True
+        except NotFound:
+            return False
 
     def create_table(
             self,

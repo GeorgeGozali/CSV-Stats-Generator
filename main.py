@@ -24,8 +24,10 @@ if __name__ == "__main__":
     db_obj = WriteDb(gcloud_key=GCLOUD_KEY)
 
     client = db_obj.get_client()
-    db_obj.table_exists(table_id, client)
-    # db_obj.create_table(table_id, client)
+
+    # check if table exists, if not, create one
+    if not db_obj.table_exists(table_id, client):
+        db_obj.create_table(table_id, client)
     # for dict_item in data:
     #     for key, values in dict_item.items():
     #         if db_obj.check_filename(key):
