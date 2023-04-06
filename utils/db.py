@@ -7,6 +7,7 @@ import os
 
 
 class WriteDb:
+    # TODO: here init should get table_id and check if project and dataset is correctly imported
     def __init__(self, gcloud_key):
         self.gcloud_key = gcloud_key
 
@@ -80,7 +81,7 @@ class WriteDb:
             return False
 
     # TODO: change to write data into bigquery
-    def write_to_db(self, _dict: dict[str, dict]) -> None:
+    def write_to_db(self, _dict: dict[str, str]) -> None:
         insert_query = """
             INSERT INTO csv_data (
                 name,
