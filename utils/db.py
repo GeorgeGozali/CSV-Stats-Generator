@@ -79,40 +79,41 @@ class WriteDb:
         else:
             return False
 
-    # TODO: change to write data into bigquery
     def write_to_db(
             self,
             _dict: list[dict[str, str]],
             table_id: str,
             client: bigquery.Client
             ) -> None:
-
+        # TODO: i need to find out other method
+        # after using this method it needs to pass 1 hour half to can update
         errors = client.insert_rows_json(table_id, _dict)
         if errors == []:
             print("Data has been added.")
         else:
             print("Encountered errors while inserting rows: {}".format(errors))
 
-    # TODO: update data into bigquery
-    def update(self, _dict: dict[str, dict]):
-        name = list(_dict)[0]
-        inner_dict: dict[str, str] = _dict.get(name)
-        csv_file_size_in_mb = inner_dict.get("csv_file_size_in_mb")
-        df_of_csv_rows_n = inner_dict.get("df_of_csv_rows_n")
-        df_of_csv_columns_n = inner_dict.get("df_of_csv_columns_n")
-        df_one_column_size_in_mb = inner_dict.get("df_one_column_size_in_mb")
-        df_size_in_mb = inner_dict.get("df_size_in_mb")
+    def update(self, _dict: dict[str, str], table_id: str, client: bigquery.Client):
+        name = _dict.get("name")
+        csv_file_size_in_mb = _dict.get("csv_file_size_in_mb")
+        df_of_csv_rows_n = _dict.get("df_of_csv_rows_n")
+        df_of_csv_columns_n = _dict.get("df_of_csv_columns_n")
+        df_one_column_size_in_mb = _dict.get("df_one_column_size_in_mb")
+        df_size_in_mb = _dict.get("df_size_in_mb")
         updated = datetime.now().isoformat("T", "seconds")
-        update_query = f"""
-            UPDATE csv_data
-            SET
+        update_query = (
+            f'UPDATE `{table_id}`\n'
+            f'''SET
                 csv_file_size_in_mb = {csv_file_size_in_mb},
                 df_of_csv_rows_n = {df_of_csv_rows_n},
                 df_of_csv_columns_n = {df_of_csv_columns_n},
                 df_one_column_size_in_mb = {df_one_column_size_in_mb},
                 df_size_in_mb = {df_size_in_mb},
                 updated = '{updated}'
-            WHERE name = '{name}';
-        """
-        self.cursor.execute(update_query)
-        self.conn.commit()
+            '''
+            f"WHERE name = '{name}'"
+        )
+
+        query_job = client.query(update_query)
+        query_job.result()
+        print(f"{query_job.num_dml_affected_rows} rows updated.")
