@@ -57,19 +57,27 @@ class WriteDb:
                 table.project, table.dataset_id, table.table_id)
         )
 
-
     # TODO: i need to change this to check filename into bigquery
-    def check_filename(self, name: str) -> bool:
-        name = name.replace(".csv", "_csv")
-        search_query = f"""
-            SELECT name FROM csv_data
-            WHERE name='{name}';
-        """
-        self.cursor.execute(search_query)
-        result = self.cursor.fetchone()
-        if result:
+    def check_filename(
+        self,
+        table_id: str,
+        name: str,
+        client: bigquery.Client
+    ) -> bool:
+
+        QUERY = (
+            f'SELECT name FROM `{table_id}` '
+            f'WHERE name = "{name}" '
+            'LIMIT 1'
+        )
+
+        query_job = client.query(QUERY)
+        rows = list(query_job.result())
+
+        if rows:
             return True
-        return False
+        else:
+            return False
 
     # TODO: change to write data into bigquery
     def write_to_db(self, _dict: dict[str, dict]) -> None:

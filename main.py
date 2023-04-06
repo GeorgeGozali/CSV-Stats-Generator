@@ -17,20 +17,24 @@ if __name__ == "__main__":
 
     table_id = f"{PROJECT_ID}.{DATASET}.{TABLE_ID}"
 
-    csv_obj = MetadataParser(path=DIR_PATH)
-    data = csv_obj.list_csvs()
+    csv_obj: MetadataParser = MetadataParser(path=DIR_PATH)
+
+    data: list[dict[str, str]] = csv_obj.list_csvs()
     csv_obj.write_to_json(data)
 
-    db_obj = WriteDb(gcloud_key=GCLOUD_KEY)
+    db_obj: WriteDb = WriteDb(gcloud_key=GCLOUD_KEY)
 
     client = db_obj.get_client()
 
     # check if table exists, if not, create one
     if not db_obj.table_exists(table_id, client):
         db_obj.create_table(table_id, client)
-    # for dict_item in data:
-    #     for key, values in dict_item.items():
-    #         if db_obj.check_filename(key):
-    #             db_obj.update(dict_item)
-    #         else:
-    #             db_obj.write_to_db(dict_item)
+    for dict_item in data:
+        name = dict_item.get("name")
+        # for key, value in dict_item.items():
+        if db_obj.check_filename(table_id, name, client):
+            # TODO: here will gow update method
+            pass
+        else:
+            # TODO: here will go create mthod
+            pass
