@@ -15,6 +15,8 @@ if __name__ == "__main__":
     DATASET = os.environ.get("DATASET")
     TABLE_ID = os.environ.get("TABLE_ID")
 
+    table_id = f"{PROJECT_ID}.{DATASET}.{TABLE_ID}"
+
     csv_obj = MetadataParser(path=DIR_PATH)
     data = csv_obj.list_csvs()
     csv_obj.write_to_json(data)
@@ -22,10 +24,11 @@ if __name__ == "__main__":
     db_obj = WriteDb(gcloud_key=GCLOUD_KEY)
 
     client = db_obj.get_client()
-    db_obj.create_table(PROJECT_ID, DATASET, TABLE_ID, client)
-    for dict_item in data:
-        for key, values in dict_item.items():
-            if db_obj.check_filename(key):
-                db_obj.update(dict_item)
-            else:
-                db_obj.write_to_db(dict_item)
+    db_obj.table_exists(table_id, client)
+    # db_obj.create_table(table_id, client)
+    # for dict_item in data:
+    #     for key, values in dict_item.items():
+    #         if db_obj.check_filename(key):
+    #             db_obj.update(dict_item)
+    #         else:
+    #             db_obj.write_to_db(dict_item)

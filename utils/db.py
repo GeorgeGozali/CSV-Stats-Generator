@@ -20,10 +20,24 @@ class WriteDb:
             )
         return client
 
+    def table_exists(
+            self,
+            table_id: str,
+            client: bigquery.Client
+    ) -> bool:
+
+        QUERY = (
+            f"SELECT size_bytes FROM {table_id}.__TABLES__"
+            "WHERE table_id='mytablename'"
+        )
+
+        job = client.query(QUERY)
+        rows = job.result()
+        print(rows)
+
+
     def create_table(
             self,
-            project_id: str,
-            dataset: str,
             table_id: str,
             client: bigquery.Client
             ) -> None:
@@ -38,7 +52,6 @@ class WriteDb:
             bigquery.SchemaField("updated", "TIMESTAMP", mode="REQUIRED"),
 
         ]
-        table_id = f"{project_id}.{dataset}.{table_id}"
 
         table = bigquery.Table(table_id, schema=schema)
         table = client.create_table(table)
