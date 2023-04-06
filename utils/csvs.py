@@ -94,13 +94,13 @@ class MetadataParser:
         return dict_list
 
     @staticmethod
-    def write_to_json(_list: list[dict]) -> None:
+    def write_to_json(_list: list[dict], path: str) -> None:
         # write data to json file with timestamp
         date = datetime.now().isoformat("T", "seconds")
 
         df = pd.DataFrame(_list)
         df.to_json(
-            f"./summary_{date}.json",
+            f"{path}/data/summary_{date}.json",
             orient='records',
             lines=True
             )

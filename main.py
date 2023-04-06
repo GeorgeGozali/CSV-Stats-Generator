@@ -15,12 +15,14 @@ if __name__ == "__main__":
     DATASET = os.environ.get("DATASET")
     TABLE_ID = os.environ.get("TABLE_ID")
 
+    PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
+
     table_id = f"{PROJECT_ID}.{DATASET}.{TABLE_ID}"
 
     csv_obj: MetadataParser = MetadataParser(path=DIR_PATH)
 
     data: list[dict[str, str]] = csv_obj.list_csvs()
-    csv_obj.write_to_json(data)
+    csv_obj.write_to_json(data, PROJECT_DIR)
 
     db_obj: WriteDb = WriteDb(gcloud_key=GCLOUD_KEY)
 
