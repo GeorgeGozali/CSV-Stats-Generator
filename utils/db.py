@@ -58,7 +58,6 @@ class WriteDb:
                 table.project, table.dataset_id, table.table_id)
         )
 
-    # TODO: i need to change this to check filename into bigquery
     def check_filename(
         self,
         table_id: str,
@@ -81,42 +80,18 @@ class WriteDb:
             return False
 
     # TODO: change to write data into bigquery
-    def write_to_db(self, _dict: dict[str, str]) -> None:
-        insert_query = """
-            INSERT INTO csv_data (
-                name,
-                csv_file_size_in_mb,
-                df_of_csv_rows_n,
-                df_of_csv_columns_n,
-                df_one_column_size_in_mb,
-                df_size_in_mb,
-                created,
-                updated
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        name = list(_dict)[0]
+    def write_to_db(
+            self,
+            _dict: list[dict[str, str]],
+            table_id: str,
+            client: bigquery.Client
+            ) -> None:
 
-        inner_dict: dict[str, str] = _dict.get(name)
-        csv_file_size_in_mb = inner_dict.get("csv_file_size_in_mb")
-        df_of_csv_rows_n = inner_dict.get("df_of_csv_rows_n")
-        df_of_csv_columns_n = inner_dict.get("df_of_csv_columns_n")
-        df_one_column_size_in_mb = inner_dict.get("df_one_column_size_in_mb")
-        df_size_in_mb = inner_dict.get("df_size_in_mb")
-        created = inner_dict.get("created")
-        updated = inner_dict.get("created")
-
-        self.cursor.execute(insert_query, (
-            name,
-            csv_file_size_in_mb,
-            df_of_csv_rows_n,
-            df_of_csv_columns_n,
-            df_one_column_size_in_mb,
-            df_size_in_mb,
-            created,
-            updated
-        ))
-        self.conn.commit()
+        errors = client.insert_rows_json(table_id, _dict)
+        if errors == []:
+            print("Data has been added.")
+        else:
+            print("Encountered errors while inserting rows: {}".format(errors))
 
     # TODO: update data into bigquery
     def update(self, _dict: dict[str, dict]):

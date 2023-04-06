@@ -34,7 +34,8 @@ if __name__ == "__main__":
         # for key, value in dict_item.items():
         if db_obj.check_filename(table_id, name, client):
             # TODO: here will gow update method
+            
             pass
         else:
             # TODO: here will go create mthod
-            pass
+            db_obj.write_to_db([dict_item], table_id, client)
