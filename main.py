@@ -1,30 +1,18 @@
-import os
-
-from dotenv import load_dotenv
+from utils import envs
 
 from utils.csvs import MetadataParser
 from utils.db import WriteDb
 
 if __name__ == "__main__":
-    dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-    load_dotenv(dotenv_path)
 
-    DIR_PATH = os.environ.get("DIR_PATH")
-    GCLOUD_KEY = os.environ.get("GCLOUD_KEY")
-    PROJECT_ID = os.environ.get("PROJECT_ID")
-    DATASET = os.environ.get("DATASET")
-    TABLE_ID = os.environ.get("TABLE_ID")
+    table_id = f"{envs.PROJECT_ID}.{envs.DATASET}.{envs.TABLE_ID}"
 
-    PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-    table_id = f"{PROJECT_ID}.{DATASET}.{TABLE_ID}"
-
-    csv_obj: MetadataParser = MetadataParser(path=DIR_PATH)
+    csv_obj: MetadataParser = MetadataParser(path=envs.CSVS_DIR)
 
     data: list[dict[str, str]] = csv_obj.list_csvs()
-    csv_obj.write_to_json(data, PROJECT_DIR)
+    csv_obj.write_to_json(data, envs.PROJECT_DIR)
 
-    db_obj: WriteDb = WriteDb(gcloud_key=GCLOUD_KEY)
+    db_obj: WriteDb = WriteDb(gcloud_key=envs.GCLOUD_KEY)
 
     client = db_obj.get_client()
 
