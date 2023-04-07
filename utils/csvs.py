@@ -26,9 +26,6 @@ class MetadataParser:
         write_to_json(_list: list[dict]) -> None
             writes list to json file
     """
-
-    csvs: list[dict] = []
-
     def __init__(self, path):
         self.path = path
         assert os.path.exists(path), f"path '{path}' does not exists"
@@ -107,6 +104,13 @@ class MetadataParser:
 
     @staticmethod
     def write_to_json(_list: list[dict], path: str) -> None:
+        """
+        This method writes data to json file
+
+        Args:
+            _list (list[dict]): list[dict] data
+            path (str): full path of the project
+        """
         # create /data, if not exists
         MetadataParser.check_or_create_dir(path)
 
