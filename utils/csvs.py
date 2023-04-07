@@ -94,11 +94,27 @@ class MetadataParser:
         return dict_list
 
     @staticmethod
+    def check_or_create_dir(path: str) -> None:
+        """
+        This method creates /data if not exists
+        summary*.json files will go into /data dir
+
+        Args:
+            path (str): full path of the project
+        """
+        if not os.path.exists(f"{path}/data"):
+            os.makedirs(f"{path}/data")
+
+    @staticmethod
     def write_to_json(_list: list[dict], path: str) -> None:
+        # create /data, if not exists
+        MetadataParser.check_or_create_dir(path)
+
         # write data to json file with timestamp
         date = datetime.now().isoformat("T", "seconds")
 
         df = pd.DataFrame(_list)
+
         df.to_json(
             f"{path}/data/summary_{date}.json",
             orient='records',
