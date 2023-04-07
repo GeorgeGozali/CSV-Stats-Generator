@@ -1,4 +1,3 @@
-import psycopg2
 from datetime import datetime
 from google.cloud import bigquery
 from google.oauth2 import service_account

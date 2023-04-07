@@ -1,4 +1,5 @@
 .*
 !.gitignore
 **pycache**
-*.json
+
+data/*.json
